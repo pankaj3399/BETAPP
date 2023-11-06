@@ -6,6 +6,7 @@ const Nav = ({ username }) => {
   const logout=()=>{
     localStorage.removeItem("token");
     localStorage.removeItem("user")
+    localStorage.removeItem("phone");
     navigate("/");
   }
   const CreateBet=()=>{

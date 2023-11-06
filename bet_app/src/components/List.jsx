@@ -1,8 +1,6 @@
-import { useEffect } from "react";
 import {
   AcceptBet,
   DeleteBet,
-  GetOpenBets,
   SendRespone,
   WagerStatus,
 } from "../utils/UtilityFunctions";

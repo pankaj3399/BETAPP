@@ -22,6 +22,12 @@ const CreateBet = () => {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    headers: { authorization: token },
+  };
+
   function isDate20MinutesGreater(inputDate) {
     // Parse the input date in ISO format
     const givenDate = new Date(inputDate);
@@ -47,7 +53,7 @@ const CreateBet = () => {
       let user = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_BACKEND_URL
-        }/user/${localStorage.getItem("user")}`
+        }/user/${localStorage.getItem("user")}`, headers
       );
       user = user.data;
       setUsername(user.name);
@@ -61,7 +67,7 @@ const CreateBet = () => {
           number: receiverNumber,
           receName: receiverName,
           sendName: senderName,
-        }
+        }, headers
       );
 
       console.log("Response:", response.data);
@@ -127,7 +133,7 @@ const CreateBet = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/createbet`,
-        betData
+        betData, headers
       );
       if (response.data.error) {
         alert("Receiver is not registerd");

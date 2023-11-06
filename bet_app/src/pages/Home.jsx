@@ -3,21 +3,28 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Nav from "../components/Nav";
 import axios from "axios";
 import List from "../components/List";
-import { GetHistory, GetOpenBets, GetRequests, GetloseBets, getWins } from "../utils/UtilityFunctions";
+import { GetHistory, GetOpenBets, GetRequests, GetloseBets, GetWins } from "../utils/UtilityFunctions";
 
 const Home = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const location = useLocation();
 
+
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    headers: { authorization: token },
+  };
+
   // Function to get user information
   const getUser = async () => {
     try {
       const user = await axios.get(
-        `${
-          import.meta.env.VITE_REACT_APP_BACKEND_URL
-        }/user/${localStorage.getItem("user")}`
+        `${import.meta.env.VITE_REACT_APP_BACKEND_URL
+        }/user/${localStorage.getItem("user")}`, headers
       );
+      console.log(user.data.name)
       setUsername(user.data.name);
     } catch (error) {
       console.error("Error while fetching user data:", error);
@@ -31,8 +38,20 @@ const Home = () => {
       navigate("/");
     }
     getUser();
-    if(location.pathname==="/home/open"){
+    if (location.pathname === "/home/open") {
       GetOpenBets(setBetList)
+    }
+    else if (location.pathname === "/home/request") {
+      GetRequests(setBetList)
+    }
+    else if (location.pathname === "/home/wins") {
+      GetWins(setBetList)
+    }
+    else if (location.pathname === "/home/lose") {
+      GetloseBets(setBetList)
+    }
+    else if (location.pathname === "/home/history") {
+      GetHistory(setBetList)
     }
   }, [navigate]);
 
@@ -45,7 +64,7 @@ const Home = () => {
           <NavLink
             className="nav_link"
             to={"/home/request"}
-            onClick={() =>{setBetList([]); GetRequests(setBetList)}}
+            onClick={() => { setBetList([]); GetRequests(setBetList) }}
           >
             Bet Request
           </NavLink>
@@ -54,7 +73,7 @@ const Home = () => {
           <NavLink
             className="nav_link"
             to={"/home/open"}
-            onClick={() => {setBetList([]);GetOpenBets(setBetList)}}
+            onClick={() => { setBetList([]); GetOpenBets(setBetList) }}
           >
             Open Bets
           </NavLink>
@@ -63,7 +82,7 @@ const Home = () => {
           <NavLink
             className="nav_link"
             to={"/home/wins"}
-            onClick={() => {setBetList([]); getWins(setBetList)}}
+            onClick={() => { setBetList([]); GetWins(setBetList) }}
           >
             Wins
           </NavLink>
@@ -72,7 +91,7 @@ const Home = () => {
           <NavLink
             className="nav_link"
             to={"/home/lose"}
-            onClick={() =>{setBetList([]); GetloseBets(setBetList)}}
+            onClick={() => { setBetList([]); GetloseBets(setBetList) }}
           >
             Loses
           </NavLink>
@@ -81,7 +100,7 @@ const Home = () => {
           <NavLink
             className="nav_link"
             to={"/home/history"}
-            onClick={() =>{setBetList([]); GetHistory(setBetList)}}
+            onClick={() => { setBetList([]); GetHistory(setBetList) }}
           >
             History
           </NavLink>

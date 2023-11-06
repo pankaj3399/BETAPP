@@ -184,7 +184,7 @@ const DetailsCard = ({
               <button
                 className="text-3xl active:scale-105 duration-200"
                 onClick={() => {
-                  wagerStatus(Isender, betid, senderWager, receiverWager,setBetList);
+                  wagerStatus(Isender, betid,setBetList);
                 }}
               >
                 <AiOutlineCheckCircle />
