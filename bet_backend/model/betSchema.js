@@ -1,25 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const betSchema = new mongoose.Schema({
   senderName: {
     type: String,
-    required: true, 
+    required: true,
   },
   senderResponse: {
     type: String,
-    required: true, 
+    required: true,
   },
-  senderNumber:{
+  senderNumber: {
     type: Number,
     required: true,
   },
   receiverName: {
     type: String,
-    required: true, 
+    required: true,
   },
   receiverResponse: {
     type: String,
-    required: false, 
+    required: false,
   },
   receiverNumber: {
     type: Number,
@@ -27,34 +27,34 @@ const betSchema = new mongoose.Schema({
   },
   criteria: {
     type: String,
-    required: true, 
+    required: true,
   },
   resolDate: {
     type: String,
-    required: true, 
+    required: true,
   },
   wager: {
     type: String,
-    required: true, 
+    required: true,
   },
   status: {
     type: String,
     required: true,
   },
-  senderFinalResp:{
+  senderFinalResp: {
     type: String,
     required: true,
   },
-  receiverFinalResp:{
+  receiverFinalResp: {
     type: String,
     required: true,
   },
-  senderWager:{
-    type:String
+  senderWager: {
+    type: String,
   },
-  receiverWager:{
-    type:String
-  }
+  receiverWager: {
+    type: String,
+  },
 });
 
-module.exports = mongoose.model('Bet', betSchema);
+module.exports = mongoose.model("Bet", betSchema);

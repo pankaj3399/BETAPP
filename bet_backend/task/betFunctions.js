@@ -1,25 +1,24 @@
-const Bet = require('../model/betSchema');
-const User=require("../model/userModel")
+const Bet = require("../model/betSchema");
+const User = require("../model/userModel");
 // API to create a new bet
 const createBet = async (req, resp) => {
   try {
-    const { receiverNumber }=req.body;
-    console.log(receiverNumber)
-    let check = await User.findOne({ phone: receiverNumber })
-    
-    if(check){
+    const { receiverNumber } = req.body;
+    console.log(receiverNumber);
+    let check = await User.findOne({ phone: receiverNumber });
+
+    if (check) {
       let bet = new Bet(req.body);
       let result = await bet.save();
       resp.send(result);
-      
+    } else {
+      console.log("The reciver is not registered");
+      resp.send({ error: "The reciver is not registered" });
     }
-    else{
-      console.log('The reciver is not registered')
-      resp.send({ error: 'The reciver is not registered'});
-    }
- 
   } catch (error) {
-    resp.status(500).send({ error: 'Error creating a bet', details: error.message });
+    resp
+      .status(500)
+      .send({ error: "Error creating a bet", details: error.message });
   }
 };
 
@@ -28,18 +27,18 @@ const getBet = async (req, resp) => {
   try {
     const arr1 = await Bet.find({
       senderNumber: req.params.num,
-      status: req.params.status
+      status: req.params.status,
     });
 
     const arr2 = await Bet.find({
       receiverNumber: req.params.num,
-      status: req.params.status
+      status: req.params.status,
     });
 
     const arr3 = [...arr1, ...arr2];
     resp.send(arr3);
   } catch (error) {
-    resp.status(500).send('An error occurred: ' + error.message);
+    resp.status(500).send("An error occurred: " + error.message);
   }
 };
 
@@ -48,12 +47,12 @@ const getRequestBet = async (req, resp) => {
   try {
     const arr2 = await Bet.find({
       receiverNumber: req.params.num,
-      status: req.params.status
+      status: req.params.status,
     });
 
     resp.send(arr2);
   } catch (error) {
-    resp.status(500).send('An error occurred: ' + error.message);
+    resp.status(500).send("An error occurred: " + error.message);
   }
 };
 
@@ -75,7 +74,7 @@ const deleteBet = async (req, resp) => {
     const result = await Bet.deleteOne({ _id: req.params.id });
     resp.send(result);
   } catch (error) {
-    resp.status(500).send('Error deleting your bet');
+    resp.status(500).send("Error deleting your bet");
   }
 };
 
@@ -84,14 +83,16 @@ const updateStatus = async (req, resp) => {
   try {
     let result = await Bet.findOne({ _id: req.params.id });
     if (!result) {
-      resp.status(404).send('Bet not found');
+      resp.status(404).send("Bet not found");
       return;
     }
     result.status = req.body.status;
     result = await result.save();
     resp.send(result);
   } catch (error) {
-    resp.status(500).send({ error: 'Error updating bet status', details: error.message });
+    resp
+      .status(500)
+      .send({ error: "Error updating bet status", details: error.message });
   }
 };
 
@@ -100,14 +101,14 @@ const setFinalResp = async (req, resp) => {
   try {
     let result = await Bet.findOne({ _id: req.params.id });
     if (!result) {
-      resp.status(404).send('Bet not found');
+      resp.status(404).send("Bet not found");
       return;
     }
     const check = req.params.check;
     const finalResp = req.body.finalResp;
-    if (check === '1') {
+    if (check === "1") {
       result.senderFinalResp = finalResp;
-    } else if (check === '0') {
+    } else if (check === "0") {
       result.receiverFinalResp = finalResp;
     } else {
       result.senderFinalResp = "NIL";
@@ -116,20 +117,30 @@ const setFinalResp = async (req, resp) => {
     result = await result.save();
     resp.send(result);
   } catch (error) {
-    resp.status(500).send({ error: 'An error occurred while processing your request' });
+    resp
+      .status(500)
+      .send({ error: "An error occurred while processing your request" });
   }
 };
 
-const SetWagerResp=async(req,resp)=>{
+const SetWagerResp = async (req, resp) => {
   let result = await Bet.findOne({ _id: req.params.id });
-  if(req.params.check=="1"){
-    result.senderWager="Yes"
-  }
-  else{
-    result.receiverWager = "Yes"
+  if (req.params.check == "1") {
+    result.senderWager = "Yes";
+  } else {
+    result.receiverWager = "Yes";
   }
   result.save();
   resp.send(result);
-}
+};
 
-module.exports = { createBet, updateStatus, getBet, setFinalResp, deleteBet, getRequestBet, changetofinal,SetWagerResp};
+module.exports = {
+  createBet,
+  updateStatus,
+  getBet,
+  setFinalResp,
+  deleteBet,
+  getRequestBet,
+  changetofinal,
+  SetWagerResp,
+};
