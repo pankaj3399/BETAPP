@@ -10,4 +10,10 @@ router.post("/login", Login);
 
 //api to get user data
 router.get("/user/:id", GetUser);
+
+// healthcheck
+router.get("/", function (req, res, next) {
+  res.send({ status: 200, msg: "OK" });
+});
+
 module.exports = router;
