@@ -126,7 +126,7 @@ const CreateBet = () => {
 
     try {
       const response = await axios.post(
-        "${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/createbet",
+        `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/createbet`,
         betData
       );
       if (response.data.error) {
