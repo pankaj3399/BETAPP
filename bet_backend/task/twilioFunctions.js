@@ -4,7 +4,6 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const serviceId = process.env.TWILIO_MESSAGING_SERVICE_ID;
 const adminNumber = process.env.TWILIO_ADMIN_NUMBER;
 const client = require("twilio")(accountSid, authToken);
-const Bet = require("../model/betSchema");
 
 const sendMessage = async (req, resp) => {
   try {

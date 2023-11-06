@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Signup, Login, GetUser } = require("../task/userFunctions");
+const { Verifytoken } = require("../middlerware");
 
 // api to post data from signup form
 router.post("/register", Signup);
@@ -9,7 +10,7 @@ router.post("/register", Signup);
 router.post("/login", Login);
 
 //api to get user data
-router.get("/user/:id", GetUser);
+router.get("/user/:id", Verifytoken, GetUser);
 
 // healthcheck
 router.get("/", function (req, res, next) {
