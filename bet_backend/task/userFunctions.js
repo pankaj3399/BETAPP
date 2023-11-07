@@ -39,7 +39,7 @@ const Login = async (req, resp) => {
 
         if (passwordIsCorrect) {
           // Create a JWT token for the user
-          jwt.sign({ id: user._id }, jwt_key, (err, token) => {
+          jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
             if (err) {
               resp.status(500).send("Something went wrong");
             }
