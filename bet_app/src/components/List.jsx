@@ -21,7 +21,7 @@ const List = ({ BetList, setBetList }) => {
  
   return (
     <div className="w-[96%] pb-4 h-full flex flex-col scroller">
-      {BetList.map((bet, index) => {
+      {BetList?.map((bet, index) => {
         const {
           senderName,
           senderResponse,

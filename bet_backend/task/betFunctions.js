@@ -124,7 +124,7 @@ const setFinalResp = async (req, resp) => {
 };
 
 const SetWagerResp = async (req, resp) => {
-  console.log("fxgxhgchjvkjkl;j;oy847fygbiouyjvhbjlkhjhn ")
+    
   let result = await Bet.findOne({ _id: req.params.id });
   if (req.params.check == "1") {
     result.senderWager = "Yes";

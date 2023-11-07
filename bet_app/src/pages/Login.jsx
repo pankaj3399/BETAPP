@@ -74,7 +74,8 @@ const Login = () => {
           localStorage.setItem("token", auth);
           localStorage.setItem("user", user._id);
           localStorage.setItem("phone", user.phone);
-          navigate("/home/open");
+          navigate("/home/request");
+          window.location.reload()
         } else {
           alert("Something went wrong");
         }

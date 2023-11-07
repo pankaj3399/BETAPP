@@ -47,6 +47,6 @@ router.post("/api/sendresult", Verifytoken, sendResult);
 router.patch('/api/setfinalresp/:id/:check', Verifytoken, setFinalResp);
 
 
-router.patch('/api/setwagerResp/:id/:check',Verifytoken, SetWagerResp);
+router.patch('/api/setwagerResp/:id/:check', SetWagerResp);
 
 module.exports = router;

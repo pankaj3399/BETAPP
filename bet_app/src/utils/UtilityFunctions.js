@@ -310,20 +310,21 @@ export const GetWins = async (setBetList) => {
 //Function to set the Wager Status
 export const WagerStatus = async (isSender, betId, setBetList) => {
     if (isSender) {
-        await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/1`, headers
+       let result= await axios.patch(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/1`,headers
         );
-
+      
       
 
     } else {
-        await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/0`, headers
+      let result=  await axios.patch(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/0`,headers
         );
 
-    
+       
     }
-    GetHistory(setBetList);
+    // GetHistory(setBetList);
+    window.location.reload();
 
     alert("response noted")
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Nav from "../components/Nav";
 import axios from "axios";
 import List from "../components/List";
@@ -53,7 +53,7 @@ const Home = () => {
     else if (location.pathname === "/home/history") {
       GetHistory(setBetList)
     }
-  }, [navigate]);
+  }, [location.pathname]);
 
 
   return (
