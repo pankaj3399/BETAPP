@@ -4,327 +4,413 @@ const num = localStorage.getItem("phone");
 const token = localStorage.getItem("token");
 
 const headers = {
-    headers: { authorization: token },
+  headers: { authorization: token },
 };
 
 const isDateInResolved = (customDateFormat) => {
-    // Extract the year, month, day, and time from the custom format
-    const [datePart, timePart] = customDateFormat.split("T");
-    const [year, month, day] = datePart.split("-");
-    const [hours, minutes] = timePart.split(":");
-    // Create a Date object from the custom format
-    const givenDate = new Date(year, month - 1, day, hours, minutes);
-    const currentDate = new Date();
-    return givenDate <= currentDate;
+  // Extract the year, month, day, and time from the custom format
+  const [datePart, timePart] = customDateFormat.split("T");
+  const [year, month, day] = datePart.split("-");
+  const [hours, minutes] = timePart.split(":");
+  // Create a Date object from the custom format
+  const givenDate = new Date(year, month - 1, day, hours, minutes);
+  const currentDate = new Date();
+  return givenDate <= currentDate;
 };
 // Function to fetch bet history
 export const GetHistory = async (setBetList) => {
-    try {
-        
-        let list = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`, headers
-        );
-        setBetList(list.data);
-    } catch (error) {
-        console.error("An error occurred while fetching bet history:", error);
-    }
+  try {
+    let list = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`,
+      headers
+    );
+    setBetList(list.data);
+  } catch (error) {
+    console.error("An error occurred while fetching bet history:", error);
+  }
 };
 
 // Function to fetch lose bets
 export const GetloseBets = async (setBetList) => {
-    try {
-        let list = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`, headers
-        );
-        let final_list = [];
-        list = list.data;
+  try {
+    let list = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`,
+      headers
+    );
+    let final_list = [];
+    list = list.data;
 
-        for (let i = 0; i < list.length; i++) {
-            if (list[i].senderNumber == num && list[i].senderFinalResp == "No") {
-                final_list.push(list[i]);
-            }
-            if (
-                list[i].receiverNumber == num &&
-                list[i].receiverFinalResp == "No"
-            ) {
-                final_list.push(list[i]);
-            }
-        }
-        setBetList(final_list);
-    } catch (error) {
-        console.error("An error occurred while fetching lose bets:", error);
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].senderNumber == num && list[i].senderFinalResp == "No") {
+        final_list.push(list[i]);
+      }
+      if (list[i].receiverNumber == num && list[i].receiverFinalResp == "No") {
+        final_list.push(list[i]);
+      }
     }
+    setBetList(final_list);
+  } catch (error) {
+    console.error("An error occurred while fetching lose bets:", error);
+  }
 };
-
 
 // Function to fetch open bets
 export const GetOpenBets = async (setBetList) => {
-    try {
-        let list1 = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/open`, headers
-        );
-        list1 = list1.data;
-        let list2 = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/final`, headers
-        );
-        let ids = [];
+  try {
+    let list1 = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/open`,
+      headers
+    );
+    list1 = list1.data;
+    let list2 = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/final`,
+      headers
+    );
+    let ids = [];
 
-        for (let i = 0; i < list1.length; i++) {
-            const { resolDate, _id } = list1[i];
-            if (isDateInResolved(resolDate)) {
-                ids.push(_id);
-                list1[i].status = "final";
-            }
-        }
-
-        list2 = list2.data;
-        list2 = [...list2, ...list1];
-        setBetList(list2);
-
-        if (ids.length > 0) {
-            await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatefinal`, {
-                ids: [...ids],
-            }, headers);
-        }
-    } catch (error) {
-        console.error("An error occurred while fetching open bets:", error);
+    for (let i = 0; i < list1.length; i++) {
+      const { resolDate, _id } = list1[i];
+      if (isDateInResolved(resolDate)) {
+        ids.push(_id);
+        list1[i].status = "final";
+      }
     }
-};
 
+    list2 = list2.data;
+    list2 = [...list2, ...list1];
+    setBetList(list2);
+
+    if (ids.length > 0) {
+      await axios.patch(
+        `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatefinal`,
+        {
+          ids: [...ids],
+        },
+        headers
+      );
+    }
+  } catch (error) {
+    console.error("An error occurred while fetching open bets:", error);
+  }
+};
 
 // Function to send a response to the bet
 export const SendRespone = async (
-    senderPhone,
-    receiverPhone,
-    id,
-    resp,
-    senderResp,
-    receiverResp,
-    sendername,
-    receivername,
-    setBetList
+  senderPhone,
+  receiverPhone,
+  id,
+  resp,
+  senderResp,
+  receiverResp,
+  sendername,
+  receivername,
+  setBetList
 ) => {
-    let check = 0;
-    if (senderPhone == num) {
-        check = 1;
-    }
-    if (check == 1) {
-        if (receiverResp == "NIL") {
-            await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setfinalresp/${id}/1`, {
-                finalResp: resp,
-            }, headers);
-        } else {
-            if (receiverResp == resp) {
-                alert("Both participants have given the same response");
-            } else {
-                await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setfinalresp/${id}/1`, {
-                    finalResp: resp,
-                }, headers);
-                await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatestatus/${id}`, {
-                    status: "close",
-                }, headers);
-                if (resp == "Yes") {
-                    alert("Congratulations, you won the bet");
-                    GetOpenBets(setBetList);
-
-                    try {
-                        await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                            number: senderPhone,
-                            user: sendername,
-                            result: "Winner",
-                        }, headers);
-                        await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                            number: receiverPhone,
-                            user: receivername,
-                            result: "Loser",
-                        }, headers);
-                    } catch (e) {
-                        alert("Something went wrong cannot send result message");
-                    }
-                }
-                if (resp == "No") {
-                    alert("You lose");
-                    GetOpenBets(setBetList);
-
-                    try {
-                        await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                            number: senderPhone,
-                            user: sendername,
-                            result: "Loser",
-                        }, headers);
-                        await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                            number: receiverPhone,
-                            user: receivername,
-                            result: "Winner",
-                        }, headers);
-                    } catch (e) {
-                        alert("Something went wrong cannot send result message");
-                    }
-                }
-            }
-        }
+  let check = 0;
+  if (senderPhone == num) {
+    check = 1;
+  }
+  if (check == 1) {
+    if (receiverResp == "NIL") {
+      await axios.patch(
+        `${
+          import.meta.env.VITE_REACT_APP_BACKEND_URL
+        }/api/setfinalresp/${id}/1`,
+        {
+          finalResp: resp,
+        },
+        headers
+      );
     } else {
-        if (senderResp == "NIL") {
-            await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setfinalresp/${id}/0`, {
-                finalResp: resp,
-            }, headers);
-        } else {
-            if (senderResp == resp) {
-                alert("Both participants have given the same response");
-            } else {
-                await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setfinalresp/${id}/0`, {
-                    finalResp: resp,
-                }, headers);
-                await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatestatus/${id}`, {
-                    status: "close",
-                }, headers);
-                if (resp == "Yes") {
-                    alert("Congratulations, you won the bet");
-                    GetOpenBets(setBetList);
+      if (receiverResp == resp) {
+        alert("Both participants have given the same response");
+      } else {
+        await axios.patch(
+          `${
+            import.meta.env.VITE_REACT_APP_BACKEND_URL
+          }/api/setfinalresp/${id}/1`,
+          {
+            finalResp: resp,
+          },
+          headers
+        );
+        await axios.patch(
+          `${
+            import.meta.env.VITE_REACT_APP_BACKEND_URL
+          }/api/updatestatus/${id}`,
+          {
+            status: "close",
+          },
+          headers
+        );
+        if (resp == "Yes") {
+          alert("Congratulations, you won the bet");
+          GetOpenBets(setBetList);
 
-                    await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                        number: senderPhone,
-                        user: sendername,
-                        result: "Loser",
-                    }, headers);
-                    await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                        number: receiverPhone,
-                        user: receivername,
-                        result: "Winner",
-                    }, headers);
-                }
-                if (resp == "No") {
-                    alert("You lose");
-                    GetOpenBets(setBetList);
-
-                    await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                        number: senderPhone,
-                        user: sendername,
-                        result: "Winner",
-                    }, headers);
-                    await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`, {
-                        number: receiverPhone,
-                        user: receivername,
-                        result: "Loser",
-                    }, headers);
-                }
-            }
+          try {
+            await axios.post(
+              `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+              {
+                number: senderPhone,
+                user: sendername,
+                result: "Winner",
+              },
+              headers
+            );
+            await axios.post(
+              `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+              {
+                number: receiverPhone,
+                user: receivername,
+                result: "Loser",
+              },
+              headers
+            );
+          } catch (e) {
+            alert("Something went wrong cannot send result message");
+          }
         }
-    }
-    GetOpenBets(setBetList);
-    alert("Your Response is noted");
-};
+        if (resp == "No") {
+          alert("You lose");
+          GetOpenBets(setBetList);
 
+          try {
+            await axios.post(
+              `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+              {
+                number: senderPhone,
+                user: sendername,
+                result: "Loser",
+              },
+              headers
+            );
+            await axios.post(
+              `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+              {
+                number: receiverPhone,
+                user: receivername,
+                result: "Winner",
+              },
+              headers
+            );
+          } catch (e) {
+            alert("Something went wrong cannot send result message");
+          }
+        }
+      }
+    }
+  } else {
+    if (senderResp == "NIL") {
+      await axios.patch(
+        `${
+          import.meta.env.VITE_REACT_APP_BACKEND_URL
+        }/api/setfinalresp/${id}/0`,
+        {
+          finalResp: resp,
+        },
+        headers
+      );
+    } else {
+      if (senderResp == resp) {
+        alert("Both participants have given the same response");
+      } else {
+        await axios.patch(
+          `${
+            import.meta.env.VITE_REACT_APP_BACKEND_URL
+          }/api/setfinalresp/${id}/0`,
+          {
+            finalResp: resp,
+          },
+          headers
+        );
+        await axios.patch(
+          `${
+            import.meta.env.VITE_REACT_APP_BACKEND_URL
+          }/api/updatestatus/${id}`,
+          {
+            status: "close",
+          },
+          headers
+        );
+        if (resp == "Yes") {
+          alert("Congratulations, you won the bet");
+          GetOpenBets(setBetList);
+
+          await axios.post(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+            {
+              number: senderPhone,
+              user: sendername,
+              result: "Loser",
+            },
+            headers
+          );
+          await axios.post(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+            {
+              number: receiverPhone,
+              user: receivername,
+              result: "Winner",
+            },
+            headers
+          );
+        }
+        if (resp == "No") {
+          alert("You lose");
+          GetOpenBets(setBetList);
+
+          await axios.post(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+            {
+              number: senderPhone,
+              user: sendername,
+              result: "Winner",
+            },
+            headers
+          );
+          await axios.post(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresult`,
+            {
+              number: receiverPhone,
+              user: receivername,
+              result: "Loser",
+            },
+            headers
+          );
+        }
+      }
+    }
+  }
+  GetOpenBets(setBetList);
+  alert("Your Response is noted");
+};
 
 // Function to fetch pending bet requests
 export const GetRequests = async (setBetList) => {
-    try {
-        let list = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getrequest/${num}/pending`, headers
-        );
-        list = list.data;
-        setBetList(list);
-    } catch (error) {
-        console.error("An error occurred while fetching pending bets:", error);
-    }
+  try {
+    let list = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_BACKEND_URL
+      }/api/getrequest/${num}/pending`,
+      headers
+    );
+    list = list.data;
+    setBetList(list);
+  } catch (error) {
+    console.error("An error occurred while fetching pending bets:", error);
+  }
 };
 
 // Function to delete a bet request
 export const DeleteBet = async (id, setBetList) => {
-    try {
-        let result = await axios.delete(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/deletebet/${id}`, headers
-        );
-        GetRequests(setBetList); // Refresh the bet list after deletion
-    } catch (error) {
-        console.error("An error occurred while deleting the bet:", error);
-    }
+  try {
+    await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/deletebet/${id}`,
+      headers
+    );
+    GetRequests(setBetList); // Refresh the bet list after deletion
+  } catch (error) {
+    console.error("An error occurred while deleting the bet:", error);
+  }
 };
 
 // Function to accept a bet request
-export const AcceptBet = async (id, resolDate, senderNumber, receiverNumber, setBetList) => {
-    try {
-        let result = await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatestatus/${id}`,
-            {
-                status: "open",
-            }, headers
-        );
+export const AcceptBet = async (
+  id,
+  resolDate,
+  senderNumber,
+  receiverNumber,
+  setBetList
+) => {
+  try {
+    await axios.patch(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/updatestatus/${id}`,
+      {
+        status: "open",
+      },
+      headers
+    );
 
-        GetRequests(setBetList)
-        console.log(receiverNumber);
-        let msg2 = await axios.post(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresolupdate/${id}`,
-            {
-                resolDate: resolDate,
-                number: receiverNumber,
-            }, headers
-        );
-        // Perform scheduled tasks here
-        console.log(senderNumber);
-        let msg1 = await axios.post(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresolupdate/${id}`,
-            {
-                resolDate: resolDate,
-                number: senderNumber,
-            }, headers
-        );
+    GetRequests(setBetList);
+    console.log(receiverNumber);
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresolupdate/${id}`,
+      {
+        resolDate: resolDate,
+        number: receiverNumber,
+      },
+      headers
+    );
+    // Perform scheduled tasks here
+    console.log(senderNumber);
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/sendresolupdate/${id}`,
+      {
+        resolDate: resolDate,
+        number: senderNumber,
+      },
+      headers
+    );
 
-        console.log(`Scheduled message sent for: ${resolDate} `);
-    } catch (error) {
-        console.error("An error occurred while accepting the bet:", error);
-    }
+    console.log(`Scheduled message sent for: ${resolDate} `);
+  } catch (error) {
+    console.error("An error occurred while accepting the bet:", error);
+  }
 };
-
 
 // Function to fetch closed bets with wins
 export const GetWins = async (setBetList) => {
-    try {
-        let list = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`, headers
-        );
-        list = list.data;
-        let finalList = [];
+  try {
+    let list = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/getbet/${num}/close`,
+      headers
+    );
+    list = list.data;
+    let finalList = [];
 
-        for (let i = 0; i < list.length; i++) {
-
-            if (list[i].senderNumber == num && list[i].senderFinalResp == "Yes") {
-
-                finalList.push(list[i]);
-            }
-            if (
-                list[i].receiverNumber == num &&
-                list[i].receiverFinalResp == "Yes"
-            ) {
-
-                finalList.push(list[i]);
-            }
-        }
-
-        setBetList(finalList);
-    } catch (error) {
-        console.error("An error occurred while fetching bets:", error);
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].senderNumber == num && list[i].senderFinalResp == "Yes") {
+        finalList.push(list[i]);
+      }
+      if (list[i].receiverNumber == num && list[i].receiverFinalResp == "Yes") {
+        finalList.push(list[i]);
+      }
     }
+
+    setBetList(finalList);
+  } catch (error) {
+    console.error("An error occurred while fetching bets:", error);
+  }
 };
 
 //Function to set the Wager Status
-export const WagerStatus = async (isSender, betId, setBetList) => {
-    if (isSender) {
-       let result= await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/1`,headers
-        );
-      
-      
+export const WagerStatus = async (isSender, betId, setBetList, location) => {
+  if (isSender) {
+    await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_BACKEND_URL
+      }/api/setwagerResp/${betId}/1`,
+      headers
+    );
+  } else {
+    await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_BACKEND_URL
+      }/api/setwagerResp/${betId}/0`,
+      headers
+    );
+  }
+  if (location.pathname === "/home/open") {
+    GetOpenBets(setBetList);
+  } else if (location.pathname === "/home/request") {
+    GetRequests(setBetList);
+  } else if (location.pathname === "/home/wins") {
+    GetWins(setBetList);
+  } else if (location.pathname === "/home/lose") {
+    GetloseBets(setBetList);
+  } else if (location.pathname === "/home/history") {
+    GetHistory(setBetList);
+  }
 
-    } else {
-      let result=  await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/setwagerResp/${betId}/0`,headers
-        );
-
-       
-    }
-    // GetHistory(setBetList);
-    window.location.reload();
-
-    alert("response noted")
+  alert("response noted");
 };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import { RxCrossCircled } from "react-icons/rx";
+import { useLocation } from "react-router-dom";
 
 const DetailsCard = ({
   betid,
@@ -43,7 +44,7 @@ const DetailsCard = ({
       setIsender(false);
     }
   }, []);
-
+  const location = useLocation();
 
   return (
     <div
@@ -174,7 +175,7 @@ const DetailsCard = ({
               <button
                 className="text-3xl active:scale-105 duration-200"
                 onClick={() => {
-                  wagerStatus(Isender, betid, senderWager, receiverWager,setBetList);
+                  wagerStatus(Isender, betid,setBetList,location);
                 }}
               >
                 <AiOutlineCheckCircle />
@@ -184,7 +185,7 @@ const DetailsCard = ({
               <button
                 className="text-3xl active:scale-105 duration-200"
                 onClick={() => {
-                  wagerStatus(Isender, betid,setBetList);
+                  wagerStatus(Isender, betid,setBetList,location);
                 }}
               >
                 <AiOutlineCheckCircle />

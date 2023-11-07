@@ -24,9 +24,9 @@ const Login = () => {
   };
 
   // Function to validate a phone number format
-  const validatePhone = (phone) => {
-    return true
-  };
+  // const validatePhone = (phone) => {
+  //   return true
+  // };
 
   // Function to handle user login
   const handleRegister = async (e) => {
@@ -39,12 +39,14 @@ const Login = () => {
       setPhoneEmp(true);
     } else {
       setPhoneEmp(false);
-      if (validatePhone(phone)) {
-        isPhoneErr = 1;
-        setPhoneErr(false);
-      } else {
-        setPhoneErr(true);
-      }
+      isPhoneErr = 1;
+      setPhoneErr(false);
+      // if (validatePhone(phone)) {
+      //   isPhoneErr = 1;
+      //   setPhoneErr(false);
+      // } else {
+      //   setPhoneErr(true);
+      // }
     }
 
     if (!Pass) {
@@ -75,7 +77,6 @@ const Login = () => {
           localStorage.setItem("user", user._id);
           localStorage.setItem("phone", user.phone);
           navigate("/home/request");
-          window.location.reload()
         } else {
           alert("Something went wrong");
         }
