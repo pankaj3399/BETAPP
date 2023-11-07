@@ -1,6 +1,7 @@
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const jwt_key = "bets";
+const JWT_KEY = process.env.JWT_KEY;
 const User = require("../model/userModel");
 
 // API for user signup
@@ -14,7 +15,7 @@ const Signup = async (req, resp) => {
     let result = await user.save();
 
     // Create a JWT token for the user
-    jwt.sign({ user }, jwt_key, (err, token) => {
+    jwt.sign({ user }, JWT_KEY, (err, token) => {
       if (err) {
         resp.status(500).send("Something went wrong");
       }
